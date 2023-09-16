@@ -29,17 +29,24 @@
         };
         shell = shell-utils.myShell.${system};
         craneLib = crane.mkLib pkgs;
+        rwam = craneLib.buildPackage {
+          src = craneLib.cleanCargoSource ./.;
+          buildInputs = with pkgs; [
+            fuse3
+          ];
+        };
       in
       {
+        packages.default = rwam;
         devShells.default = shell {
           name = "rust";
-          buildInputs = [pkgs.fuse3 ];
+          buildInputs = [ pkgs.fuse3 ];
           packages = [
             (pkgs.rust-bin.stable.latest.default.override {
               extensions = [ "rust-src" ];
             })
             # Rusty Web requires fuse3 and the header files installed
-            
+            pkgs.fuse3
             pkgs.stdenv.cc.cc.lib
 
           ];
